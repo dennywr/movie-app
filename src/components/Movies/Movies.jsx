@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "../Card/Card";
 import axios from "axios";
+import Header from "../Header/Header";
 
 export default function Movies() {
   const [movies, setMovies] = useState([]);
@@ -19,11 +20,15 @@ export default function Movies() {
     fetchMovies();
   }, []);
   return (
-    <div className="mt-10">
-      <h1 className="mb-10 text-3xl font-bold">Discover movie</h1>
-      <div className="flex">
-        <Card movies={movies} />
+    <>
+      <Header />
+
+      <div className="mt-10">
+        <h1 className="mb-10 text-3xl font-bold">Discover movie</h1>
+        <div className="flex">
+          <Card movies={movies} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
