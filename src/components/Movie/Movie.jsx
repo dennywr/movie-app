@@ -50,7 +50,7 @@ export default function Movie() {
             />
           </figure>
           <div className="card-body">
-            <h2 className="card-title">{movie.title}</h2>
+            <h1 className="card-title text-2xl">{movie.title}</h1>
             <p>
               {movie.release_date} •{" "}
               {movie.genres &&
