@@ -2,21 +2,26 @@ import React, { useEffect, useState } from "react";
 import Card from "../Card/Card";
 import axios from "axios";
 import Header from "../Header/Header";
+import Loader from "../Loader/Loader";
+import Message from "../Message/Message";
 
 export default function Movies() {
   const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [sortedOption, setSortedOption] = useState("mostPopular");
+  const [isError, setIsError] = useState(false);
   useEffect(() => {
     async function fetchMovies() {
       try {
+        setIsLoading(true);
         const res = await axios.get(
           `https://api.themoviedb.org/3/discover/movie?api_key=efa19839be433f24324740ff607f44d1`,
         );
         const data = res.data.results;
-        console.log(data);
         setMovies(data);
+        setIsLoading(false);
       } catch (error) {
-        console.error("Error white fetching data!");
+        setIsError(true);
       }
     }
     fetchMovies();
@@ -45,7 +50,9 @@ export default function Movies() {
           </select>
         </div>
         <div className="flex">
-          <Card movies={sortedMovie} />
+          {isLoading && !isError && <Loader />}
+          {isError && <Message />}
+          {!isLoading && !isError && <Card movies={sortedMovie} />}
         </div>
       </div>
     </>

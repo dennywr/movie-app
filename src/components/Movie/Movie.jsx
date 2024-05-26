@@ -2,21 +2,26 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../Header/Header";
+import Loader from "../Loader/Loader";
+import Message from "../Message/Message";
 
 export default function Movie() {
   const id = useParams();
   const [movie, setMovie] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   useEffect(() => {
     async function fetchMovieDetail() {
       try {
+        setIsLoading(true);
         const res = await axios.get(
           `https://api.themoviedb.org/3/movie/${id.id}?api_key=efa19839be433f24324740ff607f44d1`,
         );
         const data = res.data;
-        console.log(data);
         setMovie(data);
+        setIsLoading(false);
       } catch (error) {
-        console.error("Can't fetch movie detail");
+        setIsError(true);
       }
     }
 
@@ -39,37 +44,40 @@ export default function Movie() {
           <li>{movie.title}</li>
         </ul>
       </div>
+      {isLoading && !isError && <Loader />}
+      {isError && <Message />}
+      {!isLoading && !isError && (
+        <div className="container h-screen">
+          <div className="card card-side bg-base-100 shadow-xl">
+            <figure className="w-1/3">
+              <img
+                src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
+                alt="Movie"
+                className="h-full w-full object-cover"
+              />
+            </figure>
+            <div className="card-body">
+              <h1 className="card-title text-2xl">{movie.title}</h1>
+              <p>
+                {movie.release_date} •{" "}
+                {movie.genres &&
+                  movie.genres.map((genre, index) => (
+                    <span key={genre.id}>
+                      {genre.name}
+                      {index < movie.genres.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+              </p>
 
-      <div className="container  h-screen">
-        <div className="card card-side bg-base-100 shadow-xl">
-          <figure className="w-1/3">
-            <img
-              src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
-              alt="Movie"
-              className="h-full w-full object-cover"
-            />
-          </figure>
-          <div className="card-body">
-            <h1 className="card-title text-2xl">{movie.title}</h1>
-            <p>
-              {movie.release_date} •{" "}
-              {movie.genres &&
-                movie.genres.map((genre, index) => (
-                  <span key={genre.id}>
-                    {genre.name}
-                    {index < movie.genres.length - 1 ? ", " : ""}
-                  </span>
-                ))}
-            </p>
+              <h2 className="font-bold">Overview</h2>
+              <p>{movie.overview ? movie.overview : "-"}</p>
 
-            <h2 className="font-bold">Overview</h2>
-            <p>{movie.overview ? movie.overview : "-"}</p>
-
-            <h2 className="font-bold">Tagline</h2>
-            <p>{movie.tagline ? movie.overview : "-"}</p>
+              <h2 className="font-bold">Tagline</h2>
+              <p>{movie.tagline ? movie.overview : "-"}</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
