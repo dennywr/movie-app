@@ -4,29 +4,23 @@ import { useParams } from "react-router-dom";
 import Header from "../Header/Header";
 import Loader from "../Loader/Loader";
 import Message from "../Message/Message";
+import Rating from "../Rating/Rating";
+import { FaRegStar } from "react-icons/fa";
+import { fetchMovieById } from "../../features/movie/movieSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Movie() {
-  const id = useParams();
-  const [movie, setMovie] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  useEffect(() => {
-    async function fetchMovieDetail() {
-      try {
-        setIsLoading(true);
-        const res = await axios.get(
-          `https://api.themoviedb.org/3/movie/${id.id}?api_key=efa19839be433f24324740ff607f44d1`,
-        );
-        const data = res.data;
-        setMovie(data);
-        setIsLoading(false);
-      } catch (error) {
-        setIsError(true);
-      }
-    }
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const movie = useSelector((state) => state.movie.movie);
+  const isLoading = useSelector((state) => state.movie.isLoading);
+  const isError = useSelector((state) => state.movie.isError);
+  const [isHidden, setIsHidden] = useState(true);
 
-    fetchMovieDetail();
-  }, [id]);
+  useEffect(() => {
+    dispatch(fetchMovieById(id));
+  }, [dispatch, id]);
+
   return (
     <div className="container mx-auto h-screen px-20">
       <Header />
@@ -57,7 +51,16 @@ export default function Movie() {
               />
             </figure>
             <div className="card-body">
-              <h1 className="card-title text-2xl">{movie.title}</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="card-title text-2xl">{movie.title}</h1>
+                <div
+                  className="cursor-pointer rounded-lg bg-slate-200 p-2"
+                  onClick={() => setIsHidden(!isHidden)}
+                >
+                  <FaRegStar size={20} />
+                </div>
+                <Rating display={isHidden ? "hidden" : ""} />
+              </div>
               <p>
                 {movie.release_date} •{" "}
                 {movie.genres &&
